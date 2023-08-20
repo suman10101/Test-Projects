@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = 'secret-key';
 
+// Middleware function for authentication
 const auth = (req, res, next) => {
   const token = req.header('Authorization');
 

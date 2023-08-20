@@ -29,7 +29,7 @@ export const getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(id);
     if (movie) {
-      res.json(movie);
+      res.status(200).json(movie);
     } else {
       res.status(404).json({ message: "Movie not found." });
     }
@@ -40,9 +40,12 @@ export const getMovieById = async (req, res) => {
 
 // Get a specific movie by name
 export const searchMoviesByName = async (req, res) => {
-  const { movieName } = req.query;
+  const { name } = req.query;
   try {
-    const movies = await Movie.find({ name: { $regex: movieName, $options: 'i' } });
+    const movies = await Movie.find({ movieName: { $regex: name, $options: 'i' } });
+    if (movies.length === 0) {
+      return res.status(404).json({ message: 'No movies found' });
+    }
     res.status(200).json(movies);
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
