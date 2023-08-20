@@ -7,9 +7,9 @@ const movieSchema = new mongoose.Schema({
   director: { type: String },
   actors: [{ type: String }],
   plot: { type: String },
-  duration: { type: Number }
+  duration: { type: Number },
 });
 
-const Movie = mongoose.model('Movie', movieSchema);
+const Movie = mongoose.model("Movie", movieSchema);
 
 export default Movie;

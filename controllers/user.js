@@ -4,7 +4,10 @@ import jwt from 'jsonwebtoken';
 
 // User registration
 export const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, firstName, lastName } = req.body;
+  if (!email || !password || !firstName || !lastName) {
+    return res.status(400).json({ message: 'All required fields must be provided' });
+  }
     try {
       const existingUser = await User.findOne({ email })
         if (existingUser) return res.status(400).json({ message: "User already exist" })
@@ -13,10 +16,9 @@ export const register = async (req, res) => {
         email,
         password: hashedPassword
       });
-      res.status(201).json({newUser, message: 'User registered successfully' });
+      return res.status(201).json({newUser, message: 'User registered successfully' });
     } catch (error) {
-        console.error('Error in user registration:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ error: error.message });
     }
   };
 
@@ -38,9 +40,9 @@ export const register = async (req, res) => {
       }
   
       const token = jwt.sign({ userId: user._id }, 'secret-key', { expiresIn: '1h' });
-      res.status(200).json({ token });
+      return res.status(200).json({ token });
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ error: error.message });
     }
   };
 
@@ -48,9 +50,23 @@ export const register = async (req, res) => {
   export const getUserProfile = async (req, res) => {
     try {
       const profile = await User.find();
-      res.json(profile);
+      return res.status(200).json(profile);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching profile details." });
+      return res.status(500).json({ error: error.message });
+    }
+  };
+
+  // Fetch user profile By Id
+  export const getUserById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const profile = await User.findById(id);
+      if(profile){
+        return res.status(200).json(profile);
+      }
+      return res.status(404).json({ message: "user not found." });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
   };
 
@@ -66,9 +82,9 @@ export const register = async (req, res) => {
         return res.status(404).json({ error: 'Profile not found' });
       }
 
-      res.json({ message: 'Profile updated successfully', profile });
+      return res.json({ message: 'Profile updated successfully', profile });
     } catch (error) {
-      res.status(500).json({ error: 'An error occurred' });
+      return res.status(500).json({ error: error.message });
     }
   }
   
